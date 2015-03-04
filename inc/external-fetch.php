@@ -39,7 +39,7 @@ function create_external ( $path,$is_calendar,$is_addressbook )
   }
 }
 
-function fetch_external ( $bind_id, $min_age = '1 hour' )
+function fetch_external ( $bind_id, $min_age = '' )
 {
   if ( ! function_exists ( "curl_init" ) ) {
     dbg_error_log("external", "external resource cannot be fetched without curl, please install curl");
@@ -66,7 +66,7 @@ function fetch_external ( $bind_id, $min_age = '1 hour' )
     dbg_error_log("external", "checking external resource for remote changes " . $row->external_url );
     $ics = curl_exec ( $curl );
     $info = curl_getinfo ( $curl );
-    if ( $info['http_code'] === 304 || isset($info['filetime']) && new DateTime("@" . $info['filetime']) <=  $local_ts ) { 
+    if ( $info['http_code'] === 304 || isset($info['filetime']) && new DateTime("@" . $info['filetime']) <=  $local_ts && $info['filetime'] !=  '-1' ) { 
       dbg_error_log("external", "external resource unchanged " . $info['filetime'] . '  < ' . $local_ts->getTimestamp() );
       curl_close ( $curl );
       // BUGlet: should track server-time instead of local-time
